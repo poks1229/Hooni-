@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BDSM 테스트 250</title>
+<style>
+  :root {
+    --bg: #0c0c10;
+    --card: #16161f;
+    --accent: #ff4d6d;
+    --accent2: #c77dff;
+    --text: #f2f2f7;
+    --muted: #8e8e9a;
+    --border: #2c2c3a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+  .container {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 16px 14px 50px;
+  }
+  .header {
+    text-align: center;
+    padding: 28px 0 18px;
+  }
+  .header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .header p { color: var(--muted); font-size: 0.88rem; }
+  .disclaimer {
+    background: #1a1515;
+    border: 1px solid #3a2828;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.8rem;
+    color: #d4a0a0;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 16px;
+    margin-bottom: 14px;
+  }
+  .nick-input {
+    width: 100%;
+    background: #0e0e14;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    color: var(--text);
+    font-size: 1rem;
+    margin: 12px 0 16px;
+    outline: none;
+  }
+  .nick-input:focus { border-color: var(--accent); }
+  .start-btn, .btn-next {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), #e04080);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .start-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .progress-bar {
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    transition: width 0.25s ease;
+  }
+  .q-num {
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .q-text {
+    font-size: 1.02rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    line-height: 1.4;
+  }
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #0e0e16;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: 0.92rem;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .option:hover, .option:active {
+    border-color: var(--accent);
+    background: #1c121c;
+  }
+  .option.selected {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, #271520, #1c1224);
+  }
+  .nav {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  button {
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-prev {
+    flex: 0.4;
+    background: #2a2a38;
+    color: var(--text);
+  }
+  .btn-next { flex: 1; }
+  .btn-restart {
+    width: 100%;
+    background: var(--border);
+    color: var(--text);
+    margin-top: 14px;
+    padding: 13px;
+  }
+  .result-header {
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .result-header h2 { font-size: 1.3rem; margin-bottom: 4px; }
+  .result-header .nick {
+    color: var(--accent2);
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+  .result-header p { color: var(--muted); font-size: 0.85rem; }
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .result-card.top {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, #241520, #1a1224);
+  }
+  .result-icon {
+    font-size: 2.2rem;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a1a28;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .result-body { flex: 1; }
+  .result-rank {
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .result-name {
+    font-size: 1.08rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .score-pct {
+    font-size: 0.85rem;
+    color: var(--accent2);
+    font-weight: 600;
+  }
+  .result-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 6px 0;
+  }
+  .result-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+  }
+  .result-desc {
+    font-size: 0.84rem;
+    color: #b8b8c8;
+    line-height: 1.45;
+  }
+  .combo-box {
+    background: #12121a;
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 16px;
+    border: 1px solid var(--border);
+  }
+  .combo-box h3 {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: var(--accent2);
+  }
+  .combo-box p { font-size: 0.86rem; color: #a8a8b8; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div id="startScreen">
+    <div class="header">
+      <h1>BDSM 테스트</h1>
+      <p>플레이 · 구속 · 행동 · 상황</p>
+    </div>
+    <div class="disclaimer">
+      ⚠️ 성인(19+) 전용입니다.<br>
+      성적 취향을 솔직하게 묻는 설문입니다. 결과는 재미와 자기 탐색용이며, 실제 플레이 시 반드시 동의와 안전을 지키세요.
+    </div>
+    <div class="card">
+      <p style="font-size:0.9rem; color:#c0c0d0; margin-bottom:4px;">닉네임을 입력하세요</p>
+      <input type="text" id="nickInput" class="nick-input" placeholder="닉네임 입력" maxlength="12" oninput="checkNick()">
+      <button class="start-btn" id="startBtn" onclick="startQuiz()" disabled>테스트 시작하기</button>
+      <p style="font-size:0.78rem; color:var(--muted); margin-top:12px; text-align:center;">
+        행동과 상황 위주<br>
+        실제로 흥분되는 쪽으로 고르세요
+      </p>
+    </div>
+  </div>
+
+  <div id="quizScreen" class="hidden">
+    <div class="progress-wrap">
+      <div class="progress-text">
+        <span id="progressText">1 / 250</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0.4%"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="q-num" id="qNum">Q1</div>
+      <div class="q-text" id="qText"></div>
+      <div id="options"></div>
+    </div>
+    <div class="nav">
+      <button class="btn-prev" id="btnPrev" onclick="prevQ()" disabled>이전</button>
+      <button class="btn-next" id="btnNext" onclick="nextQ()" disabled>다음</button>
+    </div>
+  </div>
+
+  <div id="resultScreen" class="hidden">
+    <div class="result-header">
+      <h2>성향 결과</h2>
+      <div class="nick" id="resultNick"></div>
+      <p>상위 성향 순으로 정렬됩니다</p>
+    </div>
+    <div id="resultList"></div>
+    <div class="combo-box" id="comboBox"></div>
+    <button class="btn-restart" onclick="restart()">다시 테스트하기</button>
+  </div>
+</div>
+
+<script>
+const categories = {
+  vanilla: { name: "바닐라", icon: "🌸", desc: "특별한 파워플레이나 하드한 요소보다 서로 편안하게 즐기는 쪽을 선호합니다. 애정과 친밀감이 중심이 되는 타입." },
+  dominant: { name: "도미넌트", icon: "👑", desc: "상대를 리드하고 통제하는 것에서 흥분을 느낍니다. 명령하고 위치를 정하며 상대의 반응을 이끌어내는 것을 좋아합니다." },
+  submissive: { name: "서브미시브", icon: "🖤", desc: "상대에게 이끌리고 맡겨지는 것에서 안정을 느낍니다. 지시받고 통제당하는 상황에서 흥분됩니다." },
+  switch: { name: "스위치", icon: "🔄", desc: "도미넌트와 서브미시브 역할을 상황에 따라 모두 즐길 수 있습니다. 상대와 기분에 따라 유연하게 바뀝니다." },
+  daddy: { name: "대디/마미", icon: "🧸", desc: "돌봄과 통제가 결합된 타입. 상대를 이끌면서도 돌봐주고 칭찬하는 방식을 선호합니다." },
+  little: { name: "리틀", icon: "🍼", desc: "돌봄받고 싶은 욕구가 강합니다. 기대고 칭찬받고 보호받는 상황에서 흥분과 안정을 느낍니다." },
+  brat: { name: "브랫", icon: "😈", desc: "일부러 도발하고 말을 안 들으면서 상대의 반응을 이끌어내는 것을 즐깁니다." },
+  brattamer: { name: "브랫 테이머", icon: "🗡️", desc: "도발하는 상대를 길들이고 통제하는 것에서 큰 흥분을 느낍니다. 반항을 제압하는 과정 자체를 좋아합니다." },
+  pet: { name: "펫", icon: "🐾", desc: "‘키워지는’ 느낌이나 소유·훈련 플레이를 선호합니다. 목줄, 칭찬, 복종 훈련 등의 요소에 끌립니다." },
+  owner: { name: "오너", icon: "🔗", desc: "상대를 자신의 소유물처럼 여기고 키우고 싶어합니다. 소유·훈련 플레이의 탑 역할에 강하게 끌립니다." },
+  slave: { name: "슬레이브", icon: "⛓️", desc: "완전한 복종과 소유당하는 느낌에 깊이 흥분합니다. 규칙과 봉사, 낮은 위치에서 안정감을 느낍니다." },
+  master: { name: "마스터/미스트레스", icon: "⚜️", desc: "상대를 완전히 소유하고 규칙을 정하며 지배하는 것을 원합니다. 높은 강도의 파워 익스체인지를 선호합니다." },
+  sadist: { name: "사디스트", icon: "🔥", desc: "상대에게 통증이나 강한 자극을 주는 것에서 흥분을 느낍니다. 상대의 반응 자체가 자극이 됩니다." },
+  masochist: { name: "마조히스트", icon: "💧", desc: "통증이나 강한 자극을 받는 것에서 성적 흥분을 느낍니다. 맞거나 압박당하는 상황에서 쾌감을 느낍니다." },
+  spanker: { name: "스팽커", icon: "👋", desc: "상대의 엉덩이를 때리는 행위에 특화된 흥분을 느낍니다. 때리는 과정과 상대의 반응을 즐깁니다." },
+  spankee: { name: "스팽키", icon: "🍑", desc: "엉덩이를 맞는 것에서 강한 흥분을 느낍니다. 맞는 행위 자체가 성적 자극이 됩니다." },
+  degrader: { name: "디그레이더", icon: "🗣️", desc: "상대를 낮추거나 모욕적인 상황으로 이끄는 것에서 흥분을 느낍니다." },
+  degradee: { name: "디그레이디", icon: "🙇", desc: "낮춰지거나 굴욕적인 상황에서 흥분을 느낍니다." },
+  hunter: { name: "헌터", icon: "🏹", desc: "상대를 쫓고 사냥하듯이 몰아가는 플레이에 흥분합니다. 포식자 포지션을 선호합니다." },
+  prey: { name: "프레이", icon: "🐇", desc: "쫓기고 붙잡히는 느낌에서 흥분을 느낍니다. 사냥감 포지션의 긴장감과 무력감을 즐깁니다." },
+  rigger: { name: "리거", icon: "🪢", desc: "로프·수갑·끈 등으로 상대를 묶는 행위에 강한 관심을 가집니다. 구속하는 과정과 상대가 움직이지 못하는 상태를 즐깁니다." }
+};
+
+// 250 questions - unique, gender-neutral, action/situation focused, specific plays included, no animal words
+const questions = [
+  // 1-50 Power & Atmosphere
+  {q:"상대와 몸을 섞을 때 가장 흥분되는 분위기는?",opts:[{t:"서로 편안하게 주고받는 분위기",s:{vanilla:2}},{t:"내가 상대를 리드하고 통제하는 분위기",s:{dominant:2,master:1}},{t:"상대가 나를 마음대로 다루는 분위기",s:{submissive:2,slave:1}},{t:"그날 기분에 따라 역할이 바뀌는 분위기",s:{switch:2}}]},
+  {q:"상대의 움직임을 내 페이스에 맞추게 하고 싶을 때",opts:[{t:"굳이 안 해도 된다",s:{vanilla:1}},{t:"강하게 원한다",s:{dominant:2,master:1}},{t:"내가 맞춰주고 싶다",s:{submissive:2,slave:1}},{t:"서로 맞추는 게 좋다",s:{switch:2}}]},
+  {q:"상대의 반응을 일부러 늦추거나 조절하고 싶을 때",opts:[{t:"별로 관심 없다",s:{vanilla:1}},{t:"내가 조절하고 싶다",s:{dominant:2,sadist:1}},{t:"내가 조절당하고 싶다",s:{submissive:2,masochist:1}},{t:"번갈아 하고 싶다",s:{switch:2}}]},
+  {q:"상대를 ‘내 것’처럼 다루고 싶은 강도는?",opts:[{t:"약하다",s:{vanilla:1}},{t:"강하다",s:{owner:2,master:2}},{t:"오히려 소유당하고 싶다",s:{slave:2,pet:1}},{t:"서로 소유하고 싶다",s:{switch:2}}]},
+  {q:"상대가 울거나 약한 모습을 보일 때",opts:[{t:"걱정되고 멈추고 싶다",s:{vanilla:1}},{t:"더 흥분된다",s:{sadist:2}},{t:"내가 그런 모습이 되면 좋다",s:{masochist:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 완전히 내 규칙에 따라 움직이게 하는 것",opts:[{t:"과하다",s:{vanilla:1}},{t:"흥분된다",s:{master:2,owner:1}},{t:"그렇게 움직이고 싶다",s:{slave:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대의 오르가즘을 허락해야만 하게 만드는 것",opts:[{t:"굳이 안 해도 된다",s:{vanilla:1}},{t:"내가 통제하고 싶다",s:{dominant:2,master:2}},{t:"허락받고 싶다",s:{submissive:2,slave:2}},{t:"서로 가능하다면 좋다",s:{switch:2}}]},
+  {q:"상대를 벽이나 바닥에 눌러놓고 하는 것",opts:[{t:"별로다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2,hunter:1}},{t:"당하고 싶다",s:{submissive:2,prey:1}},{t:"둘 다 좋다",s:{switch:2}}]},
+  {q:"상대의 머리를 잡고 원하는 위치로 움직이는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 바닥에 엎드리게 하고 위에서 하는 것",opts:[{t:"별로다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:2}}]},
+  {q:"상대의 얼굴을 침대나 벽에 밀어넣고 하는 것",opts:[{t:"별로다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2,sadist:1}},{t:"당하고 싶다",s:{submissive:2,masochist:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대가 “제발”이라고 빌 때",opts:[{t:"마음이 약해져서 바로 해준다",s:{vanilla:1,daddy:1}},{t:"더 참기게 하거나 세게 하고 싶다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 빌고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 완전히 복종시키는 것",opts:[{t:"과하다",s:{vanilla:1}},{t:"매우 흥분된다",s:{master:3,dominant:1}},{t:"내가 복종하고 싶다",s:{slave:3}},{t:"상황에 따라 가능하다",s:{switch:1}}]},
+  {q:"상대가 무릎 꿇고 기다리며 입 벌리고 있는 모습",opts:[{t:"그냥 그렇다",s:{vanilla:1}},{t:"매우 흥분된다",s:{dominant:2,master:1}},{t:"내가 그렇게 하고 싶다",s:{submissive:2,slave:1}},{t:"둘 다 좋다",s:{switch:2}}]},
+  {q:"상대를 바닥에 무릎 꿇리고 위에서 내려다보는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"하고 싶다",s:{dominant:2,master:1}},{t:"당하고 싶다",s:{submissive:2,slave:1}},{t:"둘 다 좋다",s:{switch:2}}]},
+  {q:"상대를 내 페이스에 완전히 맞추게 하는 것",opts:[{t:"굳이 안 해도 된다",s:{vanilla:1}},{t:"강하게 원한다",s:{dominant:2,master:1}},{t:"내가 맞춰주고 싶다",s:{submissive:2,slave:1}},{t:"서로 맞추는 게 좋다",s:{switch:2}}]},
+  {q:"상대의 호흡이나 움직임을 통제하고 싶은가?",opts:[{t:"굳이",s:{vanilla:1}},{t:"강하게 원한다",s:{dominant:2}},{t:"통제당하고 싶다",s:{submissive:2}},{t:"번갈아 하고 싶다",s:{switch:2}}]},
+  {q:"상대를 무릎 꿇리고 봉사하게 하는 것",opts:[{t:"그냥 보통이다",s:{vanilla:1}},{t:"내가 시키고 싶다",s:{dominant:2,master:1}},{t:"내가 무릎 꿇고 하고 싶다",s:{submissive:2,slave:1}},{t:"둘 다 좋다",s:{switch:2}}]},
+  {q:"상대를 물건처럼 다루면서 사용하는 느낌",opts:[{t:"불편하다",s:{vanilla:1}},{t:"흥분된다",s:{degrader:2,owner:1}},{t:"물건처럼 다뤄지고 싶다",s:{degradee:2,slave:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대에게 굴욕적인 자세를 취하게 하거나, 내가 취하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 시키고 싶다",s:{degrader:2,dominant:1}},{t:"내가 취하고 싶다",s:{degradee:2,submissive:1}},{t:"둘 다 가능하다",s:{switch:1}}]},
+  {q:"상대의 얼굴을 손으로 잡고 강제로 보게 하거나 당하는 것",opts:[{t:"별로다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:2}}]},
+  {q:"상대를 ‘장난감’이나 ‘도구’로 취급하는 것",opts:[{t:"불편하다",s:{vanilla:1}},{t:"흥분된다",s:{degrader:2,owner:1}},{t:"취급당하고 싶다",s:{degradee:2,slave:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 내 스케줄과 규칙에 맞추게 하는 것",opts:[{t:"과하다",s:{vanilla:1}},{t:"흥분된다",s:{master:2,owner:1}},{t:"내가 맞춰 살고 싶다",s:{slave:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 구속한 상태에서 “이제 내 마음대로야”라고 느끼는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 그 입장이 되고 싶다",s:{dominant:2,rigger:1}},{t:"그 입장이 되고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 완전히 구속한 뒤 반응을 천천히 끌어내는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{rigger:2,dominant:2}},{t:"끌어내어지고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 구속한 상태에서 아무 때나 만지거나 사용하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{rigger:2,dominant:2}},{t:"당하는 쪽이 좋다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 목줄로 제어하며 “따라와”라고 이끄는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{owner:3}},{t:"따라가고 싶다",s:{pet:3}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 수갑과 끈으로 이중 구속하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{rigger:3}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 완전히 구속한 상태에서 하는 플레이",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 주도하고 싶다",s:{rigger:2,dominant:2}},{t:"당하는 쪽이 좋다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 사냥하듯이 몰아 붙잡는 상황",opts:[{t:"별로다",s:{vanilla:1}},{t:"내가 그 입장이 되고 싶다",s:{hunter:3}},{t:"그 입장이 되고 싶다",s:{prey:3}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 지치게 만들며 몰아가는 플레이",opts:[{t:"별로다",s:{vanilla:1}},{t:"하고 싶다",s:{hunter:3}},{t:"지치게 당하고 싶다",s:{prey:3}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 가두고 다룰 수 있는 상황",opts:[{t:"별로다",s:{vanilla:1}},{t:"만들고 싶다",s:{hunter:2,dominant:1}},{t:"가둬지고 싶다",s:{prey:2,submissive:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 세게 사용한 뒤 깨끗이 돌봐주는 것",opts:[{t:"별로 안 한다",s:{vanilla:1}},{t:"내가 해주는 게 자연스럽다",s:{daddy:2}},{t:"받고 싶다",s:{little:2}},{t:"서로 해주는 게 좋다",s:{switch:2}}]},
+  {q:"상대를 무릎에 앉히고 쓰다듬으며 달래주는 것",opts:[{t:"별로 없다",s:{vanilla:1}},{t:"하고 싶다",s:{daddy:3}},{t:"당하고 싶다",s:{little:3}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 완전히 소유하는 느낌의 플레이",opts:[{t:"과하다",s:{vanilla:1}},{t:"매우 흥분된다",s:{master:2,owner:2}},{t:"소유당하고 싶다",s:{slave:2,pet:1}},{t:"상황에 따라 가능하다",s:{switch:1}}]},
+  {q:"상대를 내 규칙 아래에서만 행동하게 하는 것",opts:[{t:"과하다",s:{vanilla:1}},{t:"흥분된다",s:{master:2}},{t:"그렇게 행동하고 싶다",s:{slave:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 구속한 상태에서 오르가즘을 허락제로 만드는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 통제하고 싶다",s:{dominant:2,master:1,rigger:1}},{t:"허락받고 싶다",s:{submissive:2,slave:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 목줄로 자세를 낮추게 하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{owner:2,dominant:1}},{t:"낮춰지고 싶다",s:{pet:2,submissive:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 수갑으로 고정한 채 원하는 자세를 취하게 하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 시키고 싶다",s:{rigger:2,dominant:2}},{t:"취하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 로프로 묶은 채 움직이지 못하게 한 상태에서 하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 주도하고 싶다",s:{rigger:3,dominant:1}},{t:"당하는 쪽이 좋다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 완전히 구속한 상태에서 천천히 자극을 주는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{rigger:2,dominant:2,sadist:1}},{t:"당하는 쪽이 좋다",s:{submissive:2,masochist:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 구속한 뒤 반응을 보며 가지고 노는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{rigger:2,dominant:2}},{t:"가지고 놀리고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"전반적으로 상대와 할 때 원하는 분위기는?",opts:[{t:"편안하고 서로 존중하는 분위기",s:{vanilla:3}},{t:"내가 리드하고 상대를 이끄는 분위기",s:{dominant:2,master:1}},{t:"상대에게 이끌리고 맡겨지는 분위기",s:{submissive:2,slave:1}},{t:"그날그날 역할이 바뀌는 분위기",s:{switch:3}}]},
+
+  // 51-100 Restraint focused
+  {q:"상대를 키우듯이 다루며 훈련하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 키우고 싶다",s:{owner:3}},{t:"내가 그렇게 다뤄지고 싶다",s:{pet:3}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 머미피케이션(전신 감싸기) 하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{rigger:3}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 휴먼 퍼니처처럼 사용하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{owner:2,degrader:1}},{t:"당하는 쪽이 좋다",s:{slave:2,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 체이스티티 장치로 통제하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 통제하고 싶다",s:{dominant:2,master:1}},{t:"통제당하고 싶다",s:{submissive:2,slave:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대에게 온도 플레이(왁스·아이스)를 하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 주고 싶다",s:{sadist:2,dominant:1}},{t:"받고 싶다",s:{masochist:2,submissive:1}},{t:"주고받고 싶다",s:{switch:1}}]},
+  {q:"상대를 플로거로 때리는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 때리고 싶다",s:{spanker:2,sadist:2}},{t:"맞고 싶다",s:{spankee:2,masochist:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 케인으로 때리는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 때리고 싶다",s:{spanker:2,sadist:2}},{t:"맞고 싶다",s:{spankee:2,masochist:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 패들로 때리는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 때리고 싶다",s:{spanker:3,sadist:1}},{t:"맞고 싶다",s:{spankee:3,masochist:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대에게 강제 오르가즘을 주는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 주고 싶다",s:{dominant:2,sadist:1}},{t:"당하고 싶다",s:{submissive:2,masochist:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 서스펜션(매달기) 하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{rigger:3}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 스프레더 바로 다리를 벌리게 하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{rigger:2,dominant:1}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 개그로 입을 막는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2,degrader:1}},{t:"당하고 싶다",s:{submissive:2,degradee:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 후드로 얼굴을 가리는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2,rigger:1}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 레더나 라텍스 수트로 감싸는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{rigger:1,owner:1}},{t:"당하고 싶다",s:{submissive:2,pet:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 아이스 플레이로 자극하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 주고 싶다",s:{sadist:2}},{t:"받고 싶다",s:{masochist:2}},{t:"주고받고 싶다",s:{switch:1}}]},
+  {q:"상대를 왁스 플레이로 자극하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 주고 싶다",s:{sadist:2}},{t:"받고 싶다",s:{masochist:2}},{t:"주고받고 싶다",s:{switch:1}}]},
+  {q:"상대를 니플 클램프로 자극하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{sadist:2,dominant:1}},{t:"당하고 싶다",s:{masochist:2,submissive:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 웨이트로 늘리거나 당기는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{sadist:2,rigger:1}},{t:"당하고 싶다",s:{masochist:2,submissive:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 프릭션 플레이(마찰)로 자극하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{sadist:1,dominant:1}},{t:"당하고 싶다",s:{masochist:1,submissive:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 티켓링으로 자극하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{sadist:1,dominant:1}},{t:"당하고 싶다",s:{masochist:1,submissive:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대가 울면서 약한 모습을 보일 때",opts:[{t:"걱정되고 멈추고 싶다",s:{vanilla:1,daddy:1}},{t:"더 흥분된다",s:{sadist:2}},{t:"내가 그런 모습이 되면 좋다",s:{masochist:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 도망가려고 할 때",opts:[{t:"그냥 놔둔다",s:{vanilla:1}},{t:"붙잡아서 제압하고 싶다",s:{hunter:2,dominant:1,brattamer:1}},{t:"내가 도망가고 싶다",s:{prey:2,brat:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 몸부림치며 빠져나가려고 할 때",opts:[{t:"그냥 둔다",s:{vanilla:1}},{t:"더 세게 눌러 고정한다",s:{dominant:2,rigger:1,brattamer:1}},{t:"내가 그렇게 몸부림치고 싶다",s:{submissive:1,prey:1,brat:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 울먹이면서 멈춰달라고 할 때",opts:[{t:"바로 멈춘다",s:{vanilla:1,daddy:1}},{t:"조금 더 참게 하고 싶다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 말하고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 손이 떨리거나 목소리가 갈라질 때",opts:[{t:"걱정된다",s:{vanilla:1}},{t:"더 흥분된다",s:{sadist:2}},{t:"내가 그런 상태가 되면 좋다",s:{masochist:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 눈을 피하며 몸을 움츠릴 때",opts:[{t:"부드럽게 다가간다",s:{vanilla:1,daddy:1}},{t:"강제로 얼굴을 들게 하고 싶다",s:{dominant:2,degrader:1}},{t:"내가 그렇게 움츠리고 싶다",s:{submissive:2,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 저항하면서도 결국 힘이 빠질 때",opts:[{t:"그냥 둔다",s:{vanilla:1}},{t:"그 순간이 흥분된다",s:{dominant:2,hunter:1}},{t:"내가 그렇게 힘이 빠지고 싶다",s:{submissive:2,prey:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 울음을 참고 있을 때",opts:[{t:"달래주고 싶다",s:{vanilla:1,daddy:1}},{t:"일부러 더 자극하고 싶다",s:{sadist:2}},{t:"내가 참고 있는 쪽이 좋다",s:{masochist:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 갑자기 힘이 풀려 축 늘어질 때",opts:[{t:"안아주고 싶다",s:{vanilla:1,daddy:1}},{t:"그 상태가 흥분된다",s:{dominant:1,sadist:1}},{t:"내가 그렇게 늘어지고 싶다",s:{submissive:2,masochist:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 도망치듯 몸을 비틀 때",opts:[{t:"놓아준다",s:{vanilla:1}},{t:"더 세게 붙잡는다",s:{hunter:2,dominant:1,rigger:1}},{t:"내가 그렇게 비틀고 싶다",s:{prey:2,brat:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 울면서도 피하지 않고 있을 때",opts:[{t:"멈춰주고 싶다",s:{vanilla:1}},{t:"더 세게 하고 싶다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 있고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 숨이 가빠지며 허덕일 때",opts:[{t:"쉬게 해준다",s:{vanilla:1,daddy:1}},{t:"그 모습이 흥분된다",s:{sadist:1,dominant:1}},{t:"내가 그렇게 허덕이고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 손으로 나를 밀치려고 할 때",opts:[{t:"그냥 둔다",s:{vanilla:1}},{t:"손을 잡고 제압한다",s:{dominant:2,brattamer:1}},{t:"내가 밀치고 싶다",s:{brat:2,submissive:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 무릎을 꿇은 채 울고 있을 때",opts:[{t:"일으켜 세우고 싶다",s:{vanilla:1}},{t:"그 모습이 흥분된다",s:{dominant:2,degrader:1}},{t:"내가 그렇게 울고 싶다",s:{submissive:2,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 도망가다가 결국 붙잡혔을 때",opts:[{t:"그냥 넘어간다",s:{vanilla:1}},{t:"제대로 혼내고 싶다",s:{hunter:2,brattamer:1,dominant:1}},{t:"내가 붙잡히고 싶다",s:{prey:2,submissive:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 울음을 터뜨렸을 때",opts:[{t:"바로 안아준다",s:{vanilla:1,daddy:2}},{t:"조금 더 지켜보고 싶다",s:{sadist:1,dominant:1}},{t:"내가 그렇게 울고 싶다",s:{masochist:1,little:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 힘이 빠져 더 이상 저항하지 못할 때",opts:[{t:"쉬게 해준다",s:{vanilla:1}},{t:"그 순간이 가장 흥분된다",s:{dominant:2,hunter:1}},{t:"내가 그렇게 되고 싶다",s:{submissive:2,prey:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 눈물을 흘리며 나를 바라볼 때",opts:[{t:"부드럽게 대해주고 싶다",s:{vanilla:1,daddy:1}},{t:"더 세게 하고 싶다",s:{sadist:2}},{t:"내가 그런 눈으로 바라보고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 몸을 웅크리며 피하려고 할 때",opts:[{t:"공간을 준다",s:{vanilla:1}},{t:"끌어내서 다시 제압한다",s:{dominant:2,hunter:1}},{t:"내가 그렇게 웅크리고 싶다",s:{submissive:2,prey:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 울면서도 명령을 따를 때",opts:[{t:"그만하게 하고 싶다",s:{vanilla:1}},{t:"그 모습이 흥분된다",s:{dominant:2,sadist:1}},{t:"내가 그렇게 따르고 싶다",s:{submissive:2,masochist:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+
+  {q:"상대가 평소와 다른 성별의 옷을 입고 있는 모습",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"흥분된다",s:{dominant:1,degrader:1}},{t:"내가 그런 모습을 보이고 싶다",s:{submissive:1,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 유아적인 차림(원피스, 리본 등)으로 꾸미는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 꾸미고 싶다",s:{daddy:2,owner:1}},{t:"꾸며지고 싶다",s:{little:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 유아적인 말투나 행동을 할 때",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"돌봐주고 싶다",s:{daddy:2}},{t:"내가 그렇게 하고 싶다",s:{little:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대에게 젖병을 물리는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{daddy:2}},{t:"내가 물고 싶다",s:{little:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 포대기나 담요로 감싸는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{daddy:1,owner:1}},{t:"감싸지고 싶다",s:{little:1,pet:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 인형처럼 꾸미고 다루는 느낌",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"흥분된다",s:{owner:1,degrader:1}},{t:"인형처럼 다뤄지고 싶다",s:{pet:1,degradee:1,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 완전히 다른 사람처럼 변장한 모습",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"흥분된다",s:{dominant:1}},{t:"내가 변장하고 싶다",s:{submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대에게 특정 의상(메이드, 유니폼 등)을 입히는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 입히고 싶다",s:{dominant:1,owner:1}},{t:"입고 싶다",s:{submissive:1,pet:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 평소와 전혀 다른 분위기의 옷을 입었을 때",opts:[{t:"그냥 그렇다",s:{vanilla:1}},{t:"흥분된다",s:{dominant:1}},{t:"내가 그런 옷을 입고 싶다",s:{submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 완전히 다른 성별처럼 보이게 변장한 상태",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"흥분된다",s:{dominant:1,degrader:1}},{t:"내가 그런 상태가 되고 싶다",s:{submissive:1,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 울면서 도망치려고 발버둥 칠 때",opts:[{t:"놓아준다",s:{vanilla:1}},{t:"더 세게 제압한다",s:{hunter:2,dominant:2,brattamer:1}},{t:"내가 그렇게 발버둥 치고 싶다",s:{prey:2,submissive:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 바닥에 쓰러져 힘이 빠진 채 울고 있을 때",opts:[{t:"안아 일으킨다",s:{vanilla:1,daddy:1}},{t:"그 모습이 강하게 흥분된다",s:{sadist:2,dominant:1}},{t:"내가 그런 상태가 되고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 벽이나 바닥에 강하게 눌러 움직이지 못하게 하는 것",opts:[{t:"별로다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2,hunter:1}},{t:"당하고 싶다",s:{submissive:2,prey:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대가 울음을 터뜨리며 몸을 떨 때",opts:[{t:"바로 멈춘다",s:{vanilla:1,daddy:1}},{t:"더 자극하고 싶다",s:{sadist:2}},{t:"내가 그렇게 떨고 싶다",s:{masochist:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 도망가다가 결국 붙잡혀 힘이 빠졌을 때",opts:[{t:"그냥 넘어간다",s:{vanilla:1}},{t:"제대로 제압하고 싶다",s:{hunter:2,brattamer:1,dominant:1}},{t:"내가 붙잡히고 싶다",s:{prey:2,submissive:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 눈이 가려진 채 소리만 듣고 반응할 때",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"그 모습이 흥분된다",s:{dominant:2,sadist:1}},{t:"내가 그런 상태가 되고 싶다",s:{submissive:2,masochist:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대가 울면서도 도망가지 않고 그 자리에 있을 때",opts:[{t:"멈춰주고 싶다",s:{vanilla:1}},{t:"더 세게 하고 싶다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 있고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 바닥에 엎드리게 한 뒤 위에서 완전히 누르는 것",opts:[{t:"별로다",s:{vanilla:1}},{t:"하고 싶다",s:{dominant:2}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대가 힘이 빠져 더 이상 몸을 가누지 못할 때",opts:[{t:"쉬게 해준다",s:{vanilla:1,daddy:1}},{t:"그 순간이 가장 흥분된다",s:{dominant:2,sadist:1}},{t:"내가 그렇게 되고 싶다",s:{submissive:2,masochist:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 울먹이며 손으로 나를 밀어내려 할 때",opts:[{t:"놓아준다",s:{vanilla:1}},{t:"손을 잡고 더 세게 제압한다",s:{dominant:2,brattamer:1}},{t:"내가 그렇게 밀고 싶다",s:{brat:1,submissive:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 눈물을 흘리며 고개를 떨굴 때",opts:[{t:"고개 들어주며 달랜다",s:{vanilla:1,daddy:1}},{t:"강제로 얼굴을 들게 한다",s:{dominant:2,degrader:1}},{t:"내가 그렇게 떨구고 싶다",s:{submissive:2,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+
+  {q:"남장 또는 여장에 대한 관심은?",opts:[{t:"전혀 없다",s:{vanilla:1}},{t:"상대에게 시키고 싶다",s:{dominant:1,degrader:1}},{t:"내가 하고 싶다",s:{submissive:1,degradee:1}},{t:"상황에 따라 가능하다",s:{switch:1}}]},
+  {q:"상대를 완전히 다른 분위기의 옷으로 강제로 갈아입히는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:1,rigger:1,degrader:1}},{t:"당하고 싶다",s:{submissive:1,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 울면서 도망치려고 발버둥 칠 때 가장 하고 싶은 것은?",opts:[{t:"놓아준다",s:{vanilla:1}},{t:"더 세게 제압한다",s:{hunter:2,dominant:2,brattamer:1}},{t:"내가 그렇게 발버둥 치고 싶다",s:{prey:2,submissive:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 눈이 가려진 채 소리만으로 반응할 때",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"그 모습이 흥분된다",s:{dominant:2,sadist:1}},{t:"내가 그런 상태가 되고 싶다",s:{submissive:2,masochist:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대가 울면서 그만해달라고 할 때",opts:[{t:"바로 멈춘다",s:{vanilla:1,daddy:1}},{t:"조금 더 참게 한다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 말하고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 빌면서 눈물까지 흘릴 때",opts:[{t:"마음이 약해져 멈춘다",s:{vanilla:1,daddy:1}},{t:"더 흥분된다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 빌고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 도망가라고 했는데도 힘으로 눌러 막고 있을 때",opts:[{t:"놓아준다",s:{vanilla:1}},{t:"더 세게 누른다",s:{dominant:2,hunter:1,brattamer:1}},{t:"내가 그렇게 눌리고 싶다",s:{submissive:2,prey:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 울면서 몸을 비틀며 빠져나가려고 할 때",opts:[{t:"놓아준다",s:{vanilla:1}},{t:"더 세게 제압한다",s:{dominant:2,hunter:1}},{t:"내가 그렇게 비틀고 싶다",s:{submissive:1,prey:1,brat:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 힘이 빠져 더 이상 저항하지 못하고 울고 있을 때",opts:[{t:"안아준다",s:{vanilla:1,daddy:1}},{t:"그 모습이 가장 흥분된다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 되고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 손으로 나를 밀치면서 울 때",opts:[{t:"물러선다",s:{vanilla:1}},{t:"손을 잡고 더 세게 누른다",s:{dominant:2,brattamer:1}},{t:"내가 그렇게 밀고 싶다",s:{brat:1,submissive:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 무릎을 꿇은 채 울면서 고개를 숙이고 있을 때",opts:[{t:"일으켜 세운다",s:{vanilla:1}},{t:"그 모습이 흥분된다",s:{dominant:2,degrader:1}},{t:"내가 그렇게 있고 싶다",s:{submissive:2,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 도망치려다 결국 붙잡혀 힘이 빠졌을 때",opts:[{t:"그냥 넘어간다",s:{vanilla:1}},{t:"제대로 제압하고 싶다",s:{hunter:2,dominant:1,brattamer:1}},{t:"내가 붙잡히고 싶다",s:{prey:2,submissive:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 울음을 참지 못하고 소리를 낼 때",opts:[{t:"달래준다",s:{vanilla:1,daddy:1}},{t:"더 자극하고 싶다",s:{sadist:2}},{t:"내가 그렇게 소리 내고 싶다",s:{masochist:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 눈물을 흘리며 나를 올려다볼 때",opts:[{t:"부드럽게 대해준다",s:{vanilla:1,daddy:1}},{t:"더 세게 하고 싶다",s:{sadist:2,dominant:1}},{t:"내가 그런 눈으로 바라보고 싶다",s:{masochist:1,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 그만하라고 외치면서도 몸을 빼지 못할 때",opts:[{t:"바로 멈춘다",s:{vanilla:1}},{t:"그 상태가 흥분된다",s:{dominant:2,sadist:1}},{t:"내가 그렇게 되고 싶다",s:{submissive:2,masochist:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 발버둥 치다 결국 힘이 빠져 축 늘어질 때",opts:[{t:"쉬게 해준다",s:{vanilla:1,daddy:1}},{t:"그 순간이 가장 흥분된다",s:{dominant:2,hunter:1}},{t:"내가 그렇게 늘어지고 싶다",s:{submissive:2,prey:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 울면서 손으로 바닥을 짚고 있을 때",opts:[{t:"일으켜 준다",s:{vanilla:1}},{t:"그 모습이 흥분된다",s:{dominant:1,sadist:1}},{t:"내가 그렇게 있고 싶다",s:{submissive:2,masochist:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 도망가려고 몸을 비틀 때 힘으로 눌러 막는 것",opts:[{t:"놓아준다",s:{vanilla:1}},{t:"더 세게 누른다",s:{dominant:2,hunter:1}},{t:"내가 그렇게 눌리고 싶다",s:{submissive:2,prey:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 빌면서 어깨를 떨 때",opts:[{t:"멈춰준다",s:{vanilla:1,daddy:1}},{t:"더 흥분된다",s:{sadist:2}},{t:"내가 그렇게 떨고 싶다",s:{masochist:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 힘이 빠져 몸을 가누지 못하고 울 때",opts:[{t:"안아준다",s:{vanilla:1,daddy:1}},{t:"그 상태가 가장 흥분된다",s:{dominant:2,sadist:1}},{t:"내가 그렇게 되고 싶다",s:{submissive:2,masochist:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 손으로 얼굴을 가리며 울 때",opts:[{t:"손을 치워주고 달랜다",s:{vanilla:1,daddy:1}},{t:"손을 치우고 얼굴을 보게 한다",s:{dominant:2,degrader:1}},{t:"내가 그렇게 가리고 싶다",s:{submissive:1,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 도망가라고 했는데 오히려 더 세게 누르고 있을 때",opts:[{t:"놓아준다",s:{vanilla:1}},{t:"그 상황 자체가 흥분된다",s:{dominant:2,hunter:1}},{t:"내가 그렇게 눌리고 싶다",s:{submissive:2,prey:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 울음을 터뜨리며 몸을 움츠릴 때",opts:[{t:"공간을 준다",s:{vanilla:1}},{t:"끌어내서 다시 제압한다",s:{dominant:2}},{t:"내가 그렇게 움츠리고 싶다",s:{submissive:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+
+  {q:"상대를 의자에 묶거나 고정한 채 자극하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{rigger:1,dominant:2}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대에게 감각을 차단한 상태(눈·귀)로 자극하는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대를 바닥에 엎드리게 한 뒤 뒤에서 다루는 것",opts:[{t:"별로다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2}},{t:"당하고 싶다",s:{submissive:2}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대가 울면서 빌 때 가장 흥분되는 쪽은?",opts:[{t:"바로 멈춰주는 쪽",s:{vanilla:1,daddy:1}},{t:"더 세게 하는 쪽",s:{sadist:2,dominant:1}},{t:"내가 빌고 있는 쪽",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 도망가려고 할 때 힘으로 눌러 막는 것",opts:[{t:"놓아준다",s:{vanilla:1}},{t:"더 세게 누른다",s:{dominant:2,hunter:1}},{t:"내가 눌리고 싶다",s:{submissive:2,prey:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 그만해달라고 울면서 말할 때",opts:[{t:"바로 멈춘다",s:{vanilla:1,daddy:1}},{t:"조금 더 참게 한다",s:{sadist:2}},{t:"내가 그렇게 말하고 싶다",s:{masochist:2}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 무릎 꿇린 채 내려다보며 다루는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:2,degrader:1}},{t:"당하고 싶다",s:{submissive:2,degradee:1}},{t:"둘 다 좋다",s:{switch:1}}]},
+  {q:"상대에게 특정 의상(메이드, 유니폼, 란제리 등)을 입히는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 입히고 싶다",s:{dominant:1,owner:1}},{t:"입고 싶다",s:{submissive:1,pet:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 인형처럼 꾸미고 움직이는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{owner:1,degrader:1}},{t:"그렇게 다뤄지고 싶다",s:{pet:1,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대를 완전히 다른 분위기로 변장시키는 것",opts:[{t:"관심 없다",s:{vanilla:1}},{t:"내가 하고 싶다",s:{dominant:1,degrader:1}},{t:"당하고 싶다",s:{submissive:1,degradee:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 힘이 빠져 울면서 축 늘어져 있을 때",opts:[{t:"안아준다",s:{vanilla:1,daddy:1}},{t:"그 모습이 가장 흥분된다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 되고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+
+  {q:"기저귀를 사용하거나 채우는 것에 대한 관심은?",opts:[{t:"전혀 없다",s:{vanilla:1}},{t:"상대에게 시키고 싶다",s:{owner:1,daddy:1}},{t:"내가 착용하고 싶다",s:{little:1,pet:1}},{t:"상황에 따라 가능하다",s:{switch:1}}]},
+  {q:"남장 또는 여장에 대한 관심은?",opts:[{t:"전혀 없다",s:{vanilla:1}},{t:"상대에게 시키고 싶다",s:{dominant:1,degrader:1}},{t:"내가 하고 싶다",s:{submissive:1,degradee:1}},{t:"상황에 따라 가능하다",s:{switch:1}}]},
+  {q:"상대가 울면서 그만해달라고 할 때",opts:[{t:"바로 멈춘다",s:{vanilla:1,daddy:1}},{t:"조금 더 참게 한다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 말하고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 빌면서 눈물을 흘릴 때",opts:[{t:"마음이 약해져 멈춘다",s:{vanilla:1,daddy:1}},{t:"더 흥분된다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 빌고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"상대가 도망가려고 할 때 힘으로 눌러 막는 것",opts:[{t:"놓아준다",s:{vanilla:1}},{t:"더 세게 누른다",s:{dominant:2,hunter:1}},{t:"내가 눌리고 싶다",s:{submissive:2,prey:1}},{t:"상황을 즐긴다",s:{switch:1}}]},
+  {q:"상대가 힘이 빠져 울면서 축 늘어져 있을 때",opts:[{t:"안아준다",s:{vanilla:1,daddy:1}},{t:"그 모습이 가장 흥분된다",s:{sadist:2,dominant:1}},{t:"내가 그렇게 되고 싶다",s:{masochist:2,submissive:1}},{t:"상황에 따라 다르다",s:{switch:1}}]},
+  {q:"마지막으로, 지금 가장 해보고 싶은 플레이 스타일은?",opts:[{t:"서로 편안하게 주고받는 쪽",s:{vanilla:3}},{t:"내가 상대를 완전히 지배하는 쪽",s:{dominant:2,master:1,owner:1}},{t:"내가 완전히 지배당하는 쪽",s:{submissive:2,slave:1,pet:1}},{t:"역할을 자유롭게 바꾸는 쪽",s:{switch:3}}]}
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+let scores = {};
+let nickname = "";
+
+function checkNick() {
+  const v = document.getElementById('nickInput').value.trim();
+  document.getElementById('startBtn').disabled = v.length < 1;
+}
+
+function initScores() {
+  scores = {};
+  Object.keys(categories).forEach(k => scores[k] = 0);
+}
+
+function startQuiz() {
+  nickname = document.getElementById('nickInput').value.trim() || "익명";
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('quizScreen').classList.remove('hidden');
+  initScores();
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = questions[current];
+  document.getElementById('qNum').textContent = `Q${current + 1}`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('progressText').textContent = `${current + 1} / ${questions.length}`;
+  const pct = ((current + 1) / questions.length * 100).toFixed(0);
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  const optsDiv = document.getElementById('options');
+  optsDiv.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option' + (answers[current] === i ? ' selected' : '');
+    btn.textContent = opt.t;
+    btn.onclick = () => selectOption(i);
+    optsDiv.appendChild(btn);
+  });
+
+  document.getElementById('btnPrev').disabled = current === 0;
+  document.getElementById('btnNext').disabled = answers[current] === null;
+  document.getElementById('btnNext').textContent = current === questions.length - 1 ? '결과 보기' : '다음';
+}
+
+function selectOption(i) {
+  answers[current] = i;
+  showQuestion();
+}
+
+function nextQ() {
+  if (answers[current] === null) return;
+  if (current === questions.length - 1) {
+    calcResult();
+    return;
+  }
+  current++;
+  showQuestion();
+}
+
+function prevQ() {
+  if (current > 0) {
+    current--;
+    showQuestion();
+  }
+}
+
+function calcResult() {
+  initScores();
+  answers.forEach((ans, qi) => {
+    if (ans === null) return;
+    const s = questions[qi].opts[ans].s;
+    Object.keys(s).forEach(k => {
+      scores[k] = (scores[k] || 0) + s[k];
+    });
+  });
+
+  const sorted = Object.keys(scores)
+    .map(k => ({ key: k, score: scores[k], ...categories[k] }))
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  const maxScore = sorted.length ? sorted[0].score : 1;
+
+  document.getElementById('quizScreen').classList.add('hidden');
+  document.getElementById('resultScreen').classList.remove('hidden');
+  document.getElementById('resultNick').textContent = nickname + " 님의 결과";
+
+  const list = document.getElementById('resultList');
+  list.innerHTML = '';
+
+  sorted.slice(0, 10).forEach((item, idx) => {
+    const pct = Math.round((item.score / maxScore) * 100);
+    const div = document.createElement('div');
+    div.className = 'result-card' + (idx < 3 ? ' top' : '');
+    div.innerHTML = `
+      <div class="result-icon">${item.icon}</div>
+      <div class="result-body">
+        <div class="result-rank">${idx + 1}위</div>
+        <div class="result-name">${item.name}</div>
+        <div class="score-pct">${pct}% 매칭</div>
+        <div class="result-bar"><div class="result-fill" style="width:${pct}%"></div></div>
+        <div class="result-desc">${item.desc}</div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+
+  const topKeys = sorted.slice(0, 3).map(x => x.key);
+  let comboText = '';
+  if (topKeys.includes('switch') && (topKeys.includes('dominant') || topKeys.includes('submissive'))) {
+    comboText = '스위치 성향이 강하면서도 한쪽으로 기우는 편입니다. 상황에 따라 유연하게 역할을 바꿀 수 있어요.';
+  } else if (topKeys.includes('daddy') && topKeys.includes('little')) {
+    comboText = '돌봄을 주고받는 성향이 동시에 높습니다. 돌봄형 관계에 강하게 끌릴 수 있어요.';
+  } else if (topKeys.includes('brat') && topKeys.includes('brattamer')) {
+    comboText = '브랫과 브랫 테이머가 함께 높습니다. 도발하고 길들이는 밀당 자체를 즐기는 타입일 수 있어요.';
+  } else if (topKeys.includes('owner') && topKeys.includes('pet')) {
+    comboText = '오너와 펫 성향이 모두 있습니다. 소유·훈련 플레이에서 주고받는 것 모두 가능합니다.';
+  } else if (topKeys.includes('sadist') && topKeys.includes('masochist')) {
+    comboText = '사디스트와 마조히스트가 함께 높습니다. 통증 플레이에서 주는 것과 받는 것 모두 흥분 포인트입니다.';
+  } else if (topKeys.includes('degrader') && topKeys.includes('degradee')) {
+    comboText = '디그레이더와 디그레이디가 동시에 높습니다. 낮추는 플레이를 양방향으로 즐길 수 있어요.';
+  } else if (topKeys.includes('vanilla') && sorted[0].key === 'vanilla') {
+    comboText = '바닐라 성향이 가장 강합니다. 특별한 파워플레이보다 서로 편안하고 애정 있는 쪽을 더 선호하는 편입니다.';
+  } else if (topKeys.includes('master') || topKeys.includes('slave')) {
+    comboText = '마스터/슬레이브 쪽 성향이 드러납니다. 높은 강도의 파워 익스체인지를 원하거나 상상하는 편입니다.';
+  } else if (topKeys.includes('rigger')) {
+    comboText = '리거 성향이 두드러집니다. 수갑·끈·로프 등으로 구속하는 행위에 강한 관심을 가지고 있어요.';
+  } else {
+    comboText = '상위 성향들을 조합해보면, 당신이 실제로 흥분하는 포인트가 꽤 명확하게 보입니다. 상위 2~3개를 중심으로 상대와 이야기해보세요.';
+  }
+
+  document.getElementById('comboBox').innerHTML = `
+    <h3>조합 해석</h3>
+    <p>${comboText}</p>
+    <p style="margin-top:10px; font-size:0.82rem; color:#888;">
+      ※ 이 결과는 재미와 자기 탐색용입니다. 실제 관계에서는 상대와 충분히 대화하고 동의를 구하세요.
+    </p>
+  `;
+}
+
+function restart() {
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('startScreen').classList.remove('hidden');
+  document.getElementById('nickInput').value = '';
+  document.getElementById('startBtn').disabled = true;
+}
+</script>
+</body>
+</html>
